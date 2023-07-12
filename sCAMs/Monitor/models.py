@@ -1,3 +1,20 @@
 from django.db import models
 
-# Create your models here.
+class Room(models.Model):
+    r_name = models.CharField(max_length = 16, unique = True)
+    added_at = models.DateTimeField(auto_now_add = True)
+
+class Camera(models.Model):
+    ip_address = models.GenericIPAddressField()
+    port_num = models.IntegerField()
+    c_name = models.CharField(max_length = 16, unique = True)
+    active = models.BooleanField(default = False)
+    last_active = models.DateTimeField(null = True)
+    added_at = models.DateTimeField(auto_now_add = True)
+
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+
+class Video(models.Model):
+    created_at = models.DateTimeField(auto_now_add = True)
+
+    camera = models.ForeignKey(Camera, on_delete=models.CASCADE)
