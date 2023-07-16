@@ -5,7 +5,7 @@ class Room(models.Model):
     added_at = models.DateTimeField(auto_now_add = True)
 
 class Camera(models.Model):
-    ip_address = models.GenericIPAddressField()
+    ip_address = models.GenericIPAddressField(unique = True)
     port_num = models.IntegerField()
     c_name = models.CharField(max_length = 16, unique = True)
     active = models.BooleanField(default = False)

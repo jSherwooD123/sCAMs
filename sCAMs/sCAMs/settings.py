@@ -55,7 +55,7 @@ ROOT_URLCONF = 'sCAMs.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR/'Monitor/templates/Monitor'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <title>Manage</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    .collapsible {
+      background-color: #777;
+      color: white;
+      cursor: pointer;
+      padding: 18px;
+      width: 100%;
+      border: none;
+      text-align: left;
+      outline: none;
+      font-size: 15px;
+    }
+    
+    .active, .collapsible:hover {
+      background-color: #555;
+    }
+    
+    .content {
+      padding: 0 18px;
+      display: none;
+      overflow: hidden;
+      background-color: #f1f1f1;
+    }
+    </style>
+
+</head>
+<body>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ camera_form.as_p }}
+    <button type="submit" name="camera_submit">Add Camera</button>
+  </form>
+  
+  <form method="post">
+    {% csrf_token %}
+    {{ room_form.as_p }}
+    <button type="submit" name="room_submit">Add Room</button>
+  </form>
+  
+
+  <h1>Rooms</h1>
+  {% for room in rooms %}
+  <button type="button" class="collapsible">{{ room.r_name }}</button>
+    <div class="content">
+      <p>
+        <form method="get" action="{% url 'delete_room' room.pk %}">
+          {% csrf_token %}
+          <button type="submit">Delete Room</button>
+        </form>
+      </p>
+      <p> 
+        {% for camera in room.camera_set.all %}
+          Name : {{ camera.c_name }} 
+          <form method="get" action="{% url 'delete_camera' camera.pk %}">
+            {% csrf_token %}
+            <button type="submit">Delete</button>
+          </form>    
+        {% endfor %}
+      </p>
+    </div>
+  {% endfor %}
+
+
+  <script>
+    var coll = document.getElementsByClassName("collapsible");
+    var i;
+    
+    for (i = 0; i < coll.length; i++) {
+      coll[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var content = this.nextElementSibling;
+        if (content.style.display === "block") {
+          content.style.display = "none";
+        } else {
+          content.style.display = "block";
+        }
+      });
+    }
+  </script>
+</body>
+
+
+</html>
