@@ -1,0 +1,19 @@
+<h1>{{camera.c_name}}</h1>
+
+<p>IP Address: {{camera.ip_address}}</p>
+<p>Port Number: {{camera.port_num}}</p>
+<p>Active: {{camera.active}}</p>
+<P>Last checked if active: {{camera.last_active}}</p>
+<p>Date added: {{camera.added_at}}</p>
+
+<p>Room: {{camera.room.r_name}}</p>
+
+<form method="get" action="{% url 'delete_camera' camera.pk %}">
+    {% csrf_token %}
+    <button type="submit">Delete</button>
+</form>  
+
+<form method="get" action="{% url 'view_cam' camera.pk %}">
+    {% csrf_token %}
+    <button type="submit">View Feed</button>
+</form>  

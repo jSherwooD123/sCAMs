@@ -5,7 +5,13 @@ from .forms import CameraAdd, RoomAdd
 
 
 def index(request):
-    pass
+    return redirect('/Manage/')
+
+def view_cam(request, pk):
+    queryset = Camera.objects.get(pk = pk)
+    ip = f'http://{queryset.ip_address}:{queryset.port_num}/video_feed'
+
+    return render(request, 'view_camera.html', {'addr' : ip})
 
 def manage(request):
     camera_add = CameraAdd()
@@ -29,6 +35,10 @@ def manage(request):
 
     return render(request, 'manage.html', {'rooms': rooms, 'camera_form': camera_add, 'room_form': room_add})
 
+def manage_cam(request, pk):
+    queryset = Camera.objects.get(pk = pk)
+    return render(request, 'manage_camera.html', {'camera': queryset})
+
 def delete_camera(request, pk):
     delete = Camera.objects.get(pk = pk)
 
@@ -36,7 +46,7 @@ def delete_camera(request, pk):
         delete.delete()
         return redirect('/Manage/')
     
-    return render(request, 'camera_delete.html', {'camera' : delete})
+    return render(request, 'camera_delete.html', {'camera': delete})
 
 def delete_room(request, pk):
     delete = Room.objects.get(pk = pk)
@@ -45,4 +55,4 @@ def delete_room(request, pk):
         delete.delete()
         return redirect('/Manage/')
     
-    return render(request, 'room_delete.html', {'room' : delete})
+    return render(request, 'room_delete.html', {'room': delete})

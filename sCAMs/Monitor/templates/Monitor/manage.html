@@ -59,7 +59,11 @@
       </p>
       <p> 
         {% for camera in room.camera_set.all %}
-          Name : {{ camera.c_name }} 
+          Name : {{ camera.c_name }}
+          <form method="get" action="{% url 'manage_cam' camera.pk %}">
+            {% csrf_token %}
+            <button type="submit">Manage Camera</button>
+          </form>  
           <form method="get" action="{% url 'delete_camera' camera.pk %}">
             {% csrf_token %}
             <button type="submit">Delete</button>
