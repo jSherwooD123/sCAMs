@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 class Room(models.Model):
     r_name = models.CharField(max_length = 16, unique = True)

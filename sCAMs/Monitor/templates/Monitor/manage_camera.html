@@ -9,11 +9,17 @@
 <p>Room: {{camera.room.r_name}}</p>
 
 <form method="get" action="{% url 'delete_camera' camera.pk %}">
-    {% csrf_token %}
     <button type="submit">Delete</button>
 </form>  
 
+{% if camera.active == True %}
 <form method="get" action="{% url 'view_cam' camera.pk %}">
-    {% csrf_token %}
     <button type="submit">View Feed</button>
+</form> 
+{% else %}
+<p>The camera is not currently active.</p>
+{% endif %}
+<form method='post'>
+    {% csrf_token %}
+    <button type="submit" name="check_status">Check Status</button>
 </form>  
