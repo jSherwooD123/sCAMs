@@ -16,6 +16,9 @@ class Camera(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
 
 class Video(models.Model):
+    v_name = models.TextField()
+    humans_checked = models.BooleanField(default = False)
+    humans_dectected = models.BooleanField(null = True)
     created_at = models.DateTimeField(auto_now_add = True)
-
+    
     camera = models.ForeignKey(Camera, on_delete=models.CASCADE)

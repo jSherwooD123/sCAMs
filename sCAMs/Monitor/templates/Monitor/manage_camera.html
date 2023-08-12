@@ -6,6 +6,8 @@
 <P>Last checked if active: {{camera.last_active}}</p>
 <p>Date added: {{camera.added_at}}</p>
 
+<p>Unique Number: {{camera.pk}}</p>
+
 <p>Room: {{camera.room.r_name}}</p>
 
 <form method="get" action="{% url 'delete_camera' camera.pk %}">

@@ -1,10 +1,13 @@
-from django.shortcuts import render, redirect
 from Monitor.models import Room, Camera, Video
-from django.db.models import Prefetch
+from django.shortcuts import render, redirect
 from django.utils import timezone
+from django.db.models import Prefetch
+from .Scripts.schedualing import Cycle
 from .forms import CameraAdd, RoomAdd
 import urllib.request
 
+schedual = Cycle()
+# Change it so when the camera is discovered active it's starts recording
 def check_connection(ip,port,name):
     ip =f'http://{ip}:{port}/video_feed'
     camera = Camera.objects.get(c_name=name)
