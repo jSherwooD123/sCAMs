@@ -13,14 +13,13 @@ class Camera_Record:
         self.video_length = video_lendth
         self.recording = False
         self.save_loc = self.getSaveLoc()
-        print(self.save_loc)
 
     def startRecording(self):
         
         try:
             # Open a connection to the URL
             response = requests.get(self.url, stream=True)
-           
+     
             if response.status_code == 200:
                 self.setActivity(True)
                 bytes_data = bytes()  
@@ -43,7 +42,7 @@ class Camera_Record:
 
                     # Check if there is enough frames to create a minute video
                     if len(image_list) == self.frame_rate*60*self.video_length:
-                        print('saving')
+                    
                         #Create video saving thread
                         threading.Thread(target=self.saveVideo, daemon=True, args=(image_list, c_dt,)).start()
 
