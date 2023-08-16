@@ -1,4 +1,4 @@
-import requests, threading, cv2
+import requests, threading, cv2, os
 import numpy as np
 from Monitor.models import Video, Camera
 from datetime import datetime
@@ -7,19 +7,20 @@ from django.utils import timezone
 class Camera_Record:
 
     def __init__(self,ip,camera_pk,frame_rate = 50, video_lendth = 1):
-        print('t4')
         self.url = f"http://{ip}/video_feed"
         self.pk = camera_pk
         self.frame_rate = frame_rate
         self.video_length = video_lendth
         self.recording = False
+        self.save_loc = self.getSaveLoc()
+        print(self.save_loc)
 
     def startRecording(self):
-        print('t5')
+        
         try:
             # Open a connection to the URL
             response = requests.get(self.url, stream=True)
-            print(response.status_code)
+           
             if response.status_code == 200:
                 self.setActivity(True)
                 bytes_data = bytes()  
@@ -41,9 +42,8 @@ class Camera_Record:
                         image_list.append(image)
 
                     # Check if there is enough frames to create a minute video
-                    print(len(image_list))
                     if len(image_list) == self.frame_rate*60*self.video_length:
-                    
+                        print('saving')
                         #Create video saving thread
                         threading.Thread(target=self.saveVideo, daemon=True, args=(image_list, c_dt,)).start()
 
@@ -54,17 +54,15 @@ class Camera_Record:
         except:
             self.setActivity(False)
 
-        
-
-
     def saveVideo(self,image_list,c_dt):
 
         height, width, _ = image_list[0].shape
-        print('t6')
+ 
         # Define the codec and create VideoWriter object
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        output_video = cv2.VideoWriter(f'output_video{c_dt}.mp4', fourcc, self.frame_rate, (width, height))
-        print('t7')
+        output_loc = os.path.join(self.save_loc,f'output_video_{self.pk}_{c_dt}.mp4')
+        output_video = cv2.VideoWriter(output_loc, fourcc, self.frame_rate, (width, height))
+      
         # Write the images to the video
         for image in image_list:
                 output_video.write(image)
@@ -74,7 +72,11 @@ class Camera_Record:
         image_samples = image_list[::sample_rate]
 
         for i,v in enumerate(image_samples):
-            cv2.imwrite(f'{c_dt}Sample{i}.jpg',v)
+            output_loc = os.path.join(self.save_loc,f'Sample{i}_{self.pk}_{c_dt}.jpg')
+            cv2.imwrite(output_loc,v)
+
+        # Add video to database
+        self.updateDB(f'{self.pk}_{c_dt}')
 
         # Release the video writer and destroy any remaining OpenCV windows
         output_video.release()
@@ -95,6 +97,21 @@ class Camera_Record:
         camera.active = boolean
         camera.last_active = timezone.now() 
         camera.save()
+
+    def getSaveLoc(self):
+
+        # Gets files directory
+        curr_dir = os.getcwd()
+
+        # Sets the location for where all the files from this camera are stored
+        save_loc = os.path.join(curr_dir,'Storage',f'{self.pk}')
+
+        # If makes directory if it dosnt already exist
+        if not os.path.exists(save_loc):
+            os.makedirs(save_loc)
+
+        return save_loc
+        
 
 
 

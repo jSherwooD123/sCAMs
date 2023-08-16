@@ -68,8 +68,9 @@ def delete_camera(request, pk):
     delete = Camera.objects.get(pk = pk)
 
     if request.method == "POST":
-        delete.delete()
-        return redirect('/Manage/')
+        if 'Delete' in request.POST:
+            delete.delete()
+            return redirect('/Manage/')
     
     return render(request, 'camera_delete.html', {'camera': delete})
 
@@ -77,7 +78,8 @@ def delete_room(request, pk):
     delete = Room.objects.get(pk = pk)
 
     if request.method == "POST":
-        delete.delete()
-        return redirect('/Manage/')
+        if 'Delete' in request.POST:
+            delete.delete()
+            return redirect('/Manage/')
     
     return render(request, 'room_delete.html', {'room': delete})
