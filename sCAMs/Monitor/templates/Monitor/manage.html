@@ -29,10 +29,29 @@
       overflow: hidden;
       background-color: #f1f1f1;
     }
+
+    
+    .nav_wrapper, .cam_wrapper {
+        list-style: none;
+        padding: 0;
+    }
+
+    
+    .nav_wrapper li, .cam_wrapper div{
+        display: inline;
+        margin-right: 10px; 
+    }
     </style>
 
 </head>
 <body>
+
+  <nav>
+    <ul class = 'nav_wrapper'>
+        <li><a href="/">Manage</a></li>
+        <li><a href="/Video_query/">Video Query</a></li>
+    </ul>
+  </nav>
 
   <form method="post">
     {% csrf_token %}
@@ -56,17 +75,23 @@
           <button type="submit">Delete Room</button>
         </form>
       </p>
-      <p> 
+      <ul class='cam_wrapper'> 
         {% for camera in room.camera_set.all %}
+        <li>
           Name : {{ camera.c_name }}
+        </li>
+        <li>
           <form method="get" action="{% url 'manage_cam' camera.pk %}">
             <button type="submit">Manage Camera</button>
-          </form>  
+          </form> 
+        </li>
+        <li> 
           <form method="get" action="{% url 'delete_camera' camera.pk %}">
             <button type="submit">Delete</button>
-          </form>    
+          </form>
+        </li>    
         {% endfor %}
-      </p>
+      </ul>
     </div>
   {% endfor %}
 
