@@ -1,5 +1,5 @@
 from django import forms
-from .models import Camera, Room
+from .models import Camera, Room, Video
 
 
 class CameraAdd(forms.ModelForm):
@@ -35,3 +35,18 @@ class RoomAdd(forms.ModelForm):
         labels = {
             'r_name': 'Name',
         }
+
+
+class VideoFilter(forms.Form):
+    humans_detected = forms.NullBooleanField(required=False)
+    created_after = forms.DateTimeField(required=False, widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))
+    created_before = forms.DateTimeField(required=False, widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))
+    camera = forms.ModelChoiceField(queryset=Camera.objects.all(), required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(VideoFilter, self).__init__(*args, **kwargs)
+        self.fields['camera'].label_from_instance = lambda obj: obj.c_name
+
+
+
+    

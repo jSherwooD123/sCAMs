@@ -1,12 +1,13 @@
 from .record import Camera_Record
 from Monitor.models import Camera
-import threading, time
+import threading, time, os, datetime
 
 class Cycle:
 
     def __init__(self):
         self.cam_threads = []
         threading.Thread(target=self.recordingCycle,daemon=True).start()
+        threading.Thread(target=self.clearZIPS,daemon=True).start()
 
     def recordingCycle(self):
         while True:
@@ -44,6 +45,19 @@ class Cycle:
                 self.addThread(cams)
 
             time.sleep(60*10)
+
+    def clearZIPS(self):
+        z_path = os.path.join(os.getcwd(),'ZIPS')
+        list_dir = os.listdir( z_path )
+
+        for i in list_dir:
+            file_ctime = os.path.getctime(os.path.join(z_path,i))
+            one_day_ago = datetime.datetime.now() - datetime.timedelta(days=1)
+            if datetime.datetime.fromtimestamp(file_ctime) < one_day_ago:
+                os.remove(os.path.join(z_path,i))
+
+        time.sleep(60*60)
+
 
     def addThread(self,query_set):
         a = Camera_Record(f"{query_set.ip_address}:{query_set.port_num}",query_set.pk)

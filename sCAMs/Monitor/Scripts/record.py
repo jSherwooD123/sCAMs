@@ -67,12 +67,12 @@ class Camera_Record:
                 output_video.write(image)
 
         # Save images for human detection
-        sample_rate = len(image_list) // self.frame_rate
-        image_samples = image_list[::sample_rate]
+        #sample_rate = len(image_list) // self.frame_rate
+        #image_samples = image_list[::sample_rate]
 
-        for i,v in enumerate(image_samples):
-            output_loc = os.path.join(self.save_loc,f'Sample{i}_{self.pk}_{c_dt}.jpg')
-            cv2.imwrite(output_loc,v)
+        #for i,v in enumerate(image_samples):
+            #output_loc = os.path.join(self.save_loc,f'Sample{i}_{self.pk}_{c_dt}.jpg')
+            #cv2.imwrite(output_loc,v)
 
         # Add video to database
         self.updateDB(f'{self.pk}_{c_dt}')
@@ -82,9 +82,22 @@ class Camera_Record:
         cv2.destroyAllWindows()
 
     def updateDB(self, v_name):
-        
+        time = [i.split('-') for i in v_name.split('_')[1:]]
+        time = [[int(b) for b in a] for a in time]
+        print(time)
+
         video = Video()
         video.v_name = v_name
+        video.created_at =  timezone.make_aware(
+            datetime(
+                year=time[0][2],
+                month=time[0][1],
+                day=time[0][0],
+                hour=time[1][0],
+                minute=time[1][1],
+                second=time[1][2]),
+            timezone.get_current_timezone())
+
         video.camera = Camera.objects.get(pk = self.pk)
         video.save()
 

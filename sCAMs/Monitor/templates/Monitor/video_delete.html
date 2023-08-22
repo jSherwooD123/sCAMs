@@ -1,0 +1,10 @@
+<h1>Delete Video</h1>
+
+<p>
+    Are you sure you want to delete this Video?. {{video.r_name}}
+</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" name="Delete">Delete</button>
+</form>

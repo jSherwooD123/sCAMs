@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Video List</title>
+</head>
+<body>
+
+    <h1>Video List</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" name="SF">Filter</button>
+    </form>
+
+    <form method="post">
+    {% csrf_token %}
+    <button type="submit" name="multiple_download"> Miltiple Download </button>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Camera</th>
+                <th>Humans Checked</th>
+                <th>Humans Detected</th>
+                <th>Created At</th>
+                <th></th>
+                <th></th>
+                <th></th>
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for video in videos %}
+                <tr>
+                    <td>{{ video.v_name }}</td>
+                    <td>{{ video.camera.c_name}}</td>
+                    <td>{{ video.humans_checked }}</td>
+                    <td>
+                        {%if video.humans_detected == NULL%}
+                        N/A
+                        {%else%}
+                        {{ video.humans_detected }}
+                        {%endif%}
+                    </td>
+                    <td>{{ video.created_at|date:"Y/m/d H:i:s" }}</td>
+                    <td>
+                        <form method="get" action="{% url 'delete_video' video.pk %}">
+                            <button type="submit">Delete</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form method="get" action="{% url 'download_video' video.pk %}">
+                            <button type="submit">Download</button>
+                        </form>
+                    </td>
+                    <td>
+                        <input type='checkbox' value={{ video.pk }} name='selected'>
+                    </td>
+
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">No videos match the criteria.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </form>
+</body>
+</html>
