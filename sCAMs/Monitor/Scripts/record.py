@@ -1,4 +1,4 @@
-import requests, threading, cv2, os
+import requests, threading, cv2, os, time
 import numpy as np
 from Monitor.models import Video, Camera
 from datetime import datetime
@@ -6,10 +6,9 @@ from django.utils import timezone
 
 class Camera_Record:
 
-    def __init__(self,ip,camera_pk,frame_rate = 50, video_lendth = 1):
+    def __init__(self,ip,camera_pk, video_lendth = 5):
         self.url = f"http://{ip}/video_feed"
         self.pk = camera_pk
-        self.frame_rate = frame_rate
         self.video_length = video_lendth
         self.recording = False
         self.save_loc = self.getSaveLoc()
@@ -26,6 +25,7 @@ class Camera_Record:
                 image_list = []
                 now = datetime.now()
                 c_dt = now.strftime("%d-%m-%Y_%H-%M-%S")
+                start = time.time()
 
                 for chunk in response.iter_content(chunk_size=1024):
                     bytes_data += chunk
@@ -40,27 +40,34 @@ class Camera_Record:
                         image = cv2.imdecode(np.frombuffer(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
                         image_list.append(image)
 
-                    # Check if there is enough frames to create a minute video
-                    if len(image_list) == self.frame_rate*60*self.video_length:
+                    elipsed = time.time() - start
+
+                    # Check if the specified amount of time has passed
+                    if elipsed >= self.video_length * 60:
+
+                        # Calculate the frame rate
+                        frame_rate = len(image_list) // elipsed
                     
                         #Create video saving thread
-                        threading.Thread(target=self.saveVideo, daemon=True, args=(image_list, c_dt,)).start()
+                        threading.Thread(target=self.saveVideo, daemon=True, args=(image_list, c_dt,frame_rate)).start()
 
                         #Reset image list and datetime
                         image_list = []
                         now = datetime.now()
                         c_dt = now.strftime("%d-%m-%Y_%H-%M-%S")
+                        start = time.time()
+
         except:
             self.setActivity(False)
 
-    def saveVideo(self,image_list,c_dt):
+    def saveVideo(self,image_list,c_dt,frame_rate):
 
         height, width, _ = image_list[0].shape
  
         # Define the codec and create VideoWriter object
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         output_loc = os.path.join(self.save_loc,f'output_video_{self.pk}_{c_dt}.mp4')
-        output_video = cv2.VideoWriter(output_loc, fourcc, self.frame_rate, (width, height))
+        output_video = cv2.VideoWriter(output_loc, fourcc, frame_rate, (width, height))
       
         # Write the images to the video
         for image in image_list:
